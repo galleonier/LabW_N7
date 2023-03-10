@@ -13,7 +13,7 @@ namespace Level3
     {
         public static void Main(string[] args)
         {
-            Number1.Program.Start();
+            Number3.Program.Start();
         }
     }
 }
@@ -180,52 +180,104 @@ namespace Number1
     }
 }
 
-namespace Number2
+namespace Number3
 {
- public static class Program
+    public static class Program
     {
-        /// Лыжные гонки проводятся отдельно для двух групп участников. Результаты соревнований заданы в виде фамилий участников и
-        /// их результатов в каждой группе. Расположить результаты соревнований в каждой группе в порядке занятых мест.
-        /// Объединить результаты обеих групп с сохранением упорядоченности и вывести в виде таблицы с заголовком.
-
+        /// В соревнованиях участвуют три команды по 6 человек. Результаты соревнований представлены в виде мест участников каждой команды (1 – 18).
+        /// Определить команду-победителя, вычислив количество баллов, набранное каждой командой. Участнику, занявшему 1-е место, начисляется 5 баллов,
+        /// 2-е – 4, 3-е – 3, 4-е – 2, 5-е – 1, остальным – 0 баллов. При равенстве баллов победителем считается команда, за которую выступает участник, занявший 1-е место.
         public static void Start()
         {
-            List<Participant> TotalResult = new List<Participant>();
-            List<Participant>[] groups = new List<Participant>[2];
+            int[] Mas = new int[] { 7, 13, 2, 17, 1, 11, 10, 9, 14, 4, 18, 8, 3, 15, 5, 16, 6, 12 };
+            Group[] groups = new Group[3];
             for (int i = 0; i < groups.Length; i++)
             {
-                groups[i] = SupportMethods.GroupGenerate(i, 15 + i * 5, i+1);
-                groups[i] = SupportMethods.ParticipantListSort(groups[i]);
-                SupportMethods.PrintParticipant(groups[i]);
+                groups[i] = Group.GroupGenerate(i, 6, Mas, i );
             }
-            TotalResult = new List<Participant>(SupportMethods.CombiningTheResult(groups[0], groups[1]));
-            SupportMethods.PrintParticipantTable(TotalResult);
+            groups = SupportMethods.GroupsSort(groups);
+            Console.WriteLine("Group\tAverage mark");
+            foreach (var group in groups)
+            {
+                Console.WriteLine($"{group.ObjectName}\t{group.Result}");
+            }
+
         }
     }
 
-    public struct Participant
+    public class Player
     {
-        public string Lastname;
-        public string GroupName;
+        public string ObjectName;
         public int Result;
-        public Participant(string lastname, string groupname, int result)
+    }
+    public class Group : Player
+    {
+        public List<Player> Players;
+        public int BestResult; 
+        public Group(string objectName, List<Player> players)
         {
-            Lastname = lastname;
-            Result = result;
-            GroupName = groupname;
+            ObjectName = objectName;
+            Players = players;
+            BestResult = players[0].Result;
+            foreach (var player in Players) 
+            {
+                if (player.Result < 6) Result+=(6-player.Result);
+                if (player.Result < BestResult) BestResult = player.Result;
+            }
+            
+        }
+        public static Group GroupGenerate(int GroupNumber, int CountOfPlayers, int[] Mas, int Rang)
+        {
+            List<Player> players = new List<Player>();
+            for (int i = 0; i < CountOfPlayers; i++)
+            {
+                Player Pl = new Player();
+                Pl.ObjectName = $"Player{i}";
+                Pl.Result = Mas[(Rang * 6) + i];
+                players.Add(Pl);
+            }
+            return new Group($"Group{GroupNumber+1}", players);
         }
     }
 
     public static class SupportMethods
     {
-        public static List<Participant> ParticipantListSort(List<Participant> list)
+        public static Group[] GroupsSort(Group[] groups)
+        {
+            for (int i = 0; i < groups.Length - 1; i++)
+            {
+                Group temp;
+                for (int j = i + 1; j < groups.Length; j++)
+                {
+                    if (groups[j].Result > groups[i].Result)
+                    {
+                        temp = groups[i];
+                        groups[i] = groups[j];
+                        groups[j] = temp;
+                    }
+                    else if (groups[j].Result == groups[i].Result)
+                    {
+                        if (groups[j].BestResult > groups[i].BestResult)
+                        {
+                            temp = groups[i];
+                            groups[i] = groups[j];
+                            groups[j] = temp;
+                        }
+                    }
+                }
+            }
+
+            return groups;
+        }
+
+        public static List<Student> StudentsListSort(List<Student> list)
         {
             for (int i = 0; i < list.Count - 1; i++)
             { 
-                Participant temp; 
+                Student temp; 
                 for (int j = i + 1; j < list.Count; j++) 
                 { 
-                    if (list[j].Result > list[i].Result) 
+                    if (list[j].AverMark > list[i].AverMark) 
                     { 
                         temp = list[i]; 
                         list[i] = list[j]; 
@@ -235,86 +287,32 @@ namespace Number2
             }
             return list;
         }
-        public static List<Participant> CombiningTheResult(List<Participant> list1, List<Participant> list2)
+
+        public static void PrintStudents(Group groups)
         {
-            List<Participant> fin = new List<Participant>();
-            while (list1.Count > 0 & list2.Count > 0)
+            Console.WriteLine(groups.ObjectName);
+            foreach (var student in groups.Players)
             {
-                if (list1.Count == 0) fin.Add(list2[0]);
-                else if (list2.Count == 0)
-                    fin.Add(list1[0]);
-                else if (list1[0].Result < list2[0].Result)
-                {
-                    fin.Add(list2[0]);
-                    list2.RemoveAt(0);
-                }
-                else if (list1[0].Result > list2[0].Result)
-                {
-                    fin.Add(list1[0]);
-                    list1.RemoveAt(0);
-                }
-                else
-                {
-                    fin.Add(list1[0]);
-                    list1.RemoveAt(0);
-                    fin.Add(list2[0]);
-                    list2.RemoveAt(0);
-                }
-            }
-            return fin;
-        }
-        public static void PrintParticipant(List<Participant> group)
-        {
-            Console.WriteLine(group[0].GroupName);
-            foreach (var participant in group)
-            {
-                Console.WriteLine($"{participant.Lastname}\tResult: {participant.Result}");
+                Console.WriteLine($"{student.ObjectName}\tAverage mark: {student.Result}");
             }
             Console.WriteLine();
         }
-        public static void PrintParticipantTable(List<Participant> group)
+
+        public static int SearchForTheFirstUntested(List<Student> list)
         {
-            foreach (var participant in group)
+            int low = 0;
+            int high = list.Count - 1;
+            int Ind = 0;
+            while (list[Ind].AverMark!=0)
             {
-                Console.WriteLine($"{participant.GroupName}\t{participant.Lastname}\tResult: {participant.Result}");
-            }
-            Console.WriteLine();
+                Ind = (low + high) / 2;
+                if (0 > list[Ind].AverMark) high = Ind - 1;
+                else if (0 < list[Ind].AverMark) low = Ind + 1;
+            } 
+            while (list[Ind].AverMark == 0) Ind--;
+            return (Ind+1);
         }
-        public static List<Participant> GroupGenerate(int GroupNumber, int CountOfParticipants, int rang)
-        {
-            List<Participant> participants = new List<Participant>();
-            int stmark = 0;
-            for (int i = 0; i < CountOfParticipants; i++)
-            {
-                stmark = (i % 3) + 2;
-                participants.Add(new Participant($"F{i + 1}",$"Group{GroupNumber+1}",  ((i+1)*2)*((i%3)+1)));
-            }
-            return participants;
-        }
+        
     }
 }
 
-/* 
-2. Соревнования по футболу между командами проводятся в два
-этапа. Для проведения первого этапа участники разбиваются на две
-группы по 12 команд. Для проведения второго этапа выбирается
-6 лучших команд каждой группы по результатам первого этапа. Составить список команд участников второго этапа.
-3. В соревнованиях участвуют три команды по 6 человек. Результаты соревнований представлены в виде мест участников каждой команды (1 – 18). Определить команду-победителя, вычислив количество баллов, набранное каждой командой. Участнику, занявшему 1-е
-место, начисляется 5 баллов, 2-е – 4, 3-е – 3, 4-е – 2, 5-е – 1, остальным – 0 баллов. При равенстве баллов победителем считается команда, за которую выступает участник, занявший 1-е место.
-4. Лыжные гонки проводятся отдельно для двух групп участников. Результаты соревнований заданы в виде фамилий участников и
-их результатов в каждой группе. Расположить результаты соревнований в каждой группе в порядке занятых мест. Объединить результаты
-обеих групп с сохранением упорядоченности и вывести в виде таблицы с заголовком.
-5. Обработать результаты первенства по футболу. Результаты каждой игры заданы в виде названий команд и счета (количество забитых
-и пропущенных мячей). Сформировать таблицу очков (выигрыш – 3,
-178
-ничья – 1, проигрыш – 0) и упорядочить результаты в соответствии с
-занятым местом. Если сумма очков у двух команд одинакова, то сравниваются разности забитых и пропущенных мячей. Вывести результирующую таблицу, содержащую место, название команды, количество очков.
-6. Японская радиокомпания провела опрос радиослушателей по
-трем вопросам:
-а) какое животное вы связываете с Японией и японцами?
-б) какая черта характера присуща японцам больше всего?
-в) какой неодушевленный предмет или понятие вы связываете с
-Японией?
-Большинство опрошенных прислали ответы на все или часть вопросов. Составить программу получения первых пяти наиболее часто
-встречающихся ответов по каждому вопросу и доли (%) каждого такого ответа. Предусмотреть необходимость сжатия столбца ответов в
-случае отсутствия ответов на некоторые вопросы.*/
