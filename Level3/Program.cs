@@ -255,7 +255,7 @@ namespace Number3
                         groups[i] = groups[j];
                         groups[j] = temp;
                     }
-                    else if (groups[j].BestResult > groups[i].BestResult)
+                    else if (groups[j].Result > groups[i].Result || groups[j].BestResult > groups[i].BestResult)
                     { 
                         temp = groups[i]; 
                         groups[i] = groups[j]; 
