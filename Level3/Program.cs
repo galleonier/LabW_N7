@@ -255,64 +255,17 @@ namespace Number3
                         groups[i] = groups[j];
                         groups[j] = temp;
                     }
-                    else if (groups[j].Result == groups[i].Result)
-                    {
-                        if (groups[j].BestResult > groups[i].BestResult)
-                        {
-                            temp = groups[i];
-                            groups[i] = groups[j];
-                            groups[j] = temp;
-                        }
+                    else if (groups[j].BestResult > groups[i].BestResult)
+                    { 
+                        temp = groups[i]; 
+                        groups[i] = groups[j]; 
+                        groups[j] = temp;
                     }
                 }
             }
-
             return groups;
         }
 
-        public static List<Student> StudentsListSort(List<Student> list)
-        {
-            for (int i = 0; i < list.Count - 1; i++)
-            { 
-                Student temp; 
-                for (int j = i + 1; j < list.Count; j++) 
-                { 
-                    if (list[j].AverMark > list[i].AverMark) 
-                    { 
-                        temp = list[i]; 
-                        list[i] = list[j]; 
-                        list[j] = temp;
-                    }
-                }
-            }
-            return list;
-        }
-
-        public static void PrintStudents(Group groups)
-        {
-            Console.WriteLine(groups.ObjectName);
-            foreach (var student in groups.Players)
-            {
-                Console.WriteLine($"{student.ObjectName}\tAverage mark: {student.Result}");
-            }
-            Console.WriteLine();
-        }
-
-        public static int SearchForTheFirstUntested(List<Student> list)
-        {
-            int low = 0;
-            int high = list.Count - 1;
-            int Ind = 0;
-            while (list[Ind].AverMark!=0)
-            {
-                Ind = (low + high) / 2;
-                if (0 > list[Ind].AverMark) high = Ind - 1;
-                else if (0 < list[Ind].AverMark) low = Ind + 1;
-            } 
-            while (list[Ind].AverMark == 0) Ind--;
-            return (Ind+1);
-        }
-        
     }
 }
 
