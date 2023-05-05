@@ -102,7 +102,6 @@ namespace Number1
             }
             return new Group($"Group{GroupNumber+1}", students);
         }
-
         public void DeleteBelowIndex(int Ind)
         {
             for (int j = Ind; j < Students.Count; j++)
@@ -224,7 +223,6 @@ namespace Number3
                 if (player.Result < 6) Result+=(6-player.Result);
                 if (player.Result < BestResult) BestResult = player.Result;
             }
-            
         }
         public static Group GroupGenerate(int GroupNumber, int CountOfPlayers, int[] Mas, int Rang)
         {
